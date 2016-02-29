@@ -1,11 +1,8 @@
 module MyApp (..) where
 
-import Html exposing (..)
-import Html.Events exposing (onClick, on, targetValue)
-import Html.Attributes exposing (..)
+import Html exposing (Html)
 import Task exposing (Task)
 import Effects exposing (Never, Effects)
-import String
 import StartApp
 import Types exposing (Model, Repository)
 import Actions exposing (Action(..))
@@ -50,7 +47,7 @@ app =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div
+  Html.div
     []
     [ Repository.view address model ]
 
