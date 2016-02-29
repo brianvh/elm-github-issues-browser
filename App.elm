@@ -7,12 +7,16 @@ import StartApp
 import Types exposing (Model, Repository)
 import Actions exposing (Action(..))
 import Repository
+import Debug
+import Issues
+import GetAllRepositoryData
 
 
 initialModel : Model
 initialModel =
   { repository = Repository.nullRepository
-  , input = "jackfranklin/dotfiles"
+  , input = "jackfranklin/gulp-load-plugins"
+  , issues = []
   }
 
 
@@ -20,7 +24,7 @@ update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
     UpdateRepositoryName string ->
-      ( model, Effects.none )
+      ( { model | input = string }, Effects.none )
 
     FetchGithubData ->
       ( model, Repository.getRepositoryData model.input )
@@ -28,7 +32,19 @@ update action model =
     NewGithubData repository ->
       case repository of
         Ok repo ->
-          ( { model | repository = repo }, Effects.none )
+          ( { model | repository = repo }, Issues.getIssuesData model.input )
+
+        Err err ->
+          -- TODO: deal with errors
+          ( model, Effects.none )
+
+    FetchGithubIssues ->
+      ( model, Issues.getIssuesData model.input )
+
+    NewGithubIssues issues ->
+      case issues of
+        Ok list ->
+          ( { model | issues = list }, Effects.none )
 
         Err err ->
           -- TODO: deal with errors
@@ -54,7 +70,7 @@ view address model =
 
 init : ( Model, Effects Action )
 init =
-  ( initialModel, Repository.getRepositoryData initialModel.input )
+  ( initialModel, GetAllRepositoryData.getRepositoryAndIssueData initialModel.input )
 
 
 port tasks : Signal (Task Never ())

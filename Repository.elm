@@ -11,6 +11,7 @@ import Effects exposing (Effects)
 import Task
 import Types exposing (Repository, Model)
 import Actions exposing (Action(..))
+import Issues
 
 
 nullRepository : Repository
@@ -25,6 +26,14 @@ repositoryDecoder =
   JD.succeed Repository
     |: ("full_name" := JD.string)
     |: ("description" := JD.string)
+
+
+getRepositoryAndIssueData : String -> Effects Action
+getRepositoryAndIssueData input =
+  [ getRepositoryData input
+  , Issues.getIssuesData input
+  ]
+    |> Effects.batch
 
 
 getRepositoryData : String -> Effects Action
@@ -43,4 +52,5 @@ view address model =
     , input [ on "input" targetValue (\str -> Signal.message address (UpdateRepositoryName str)), value model.input ] []
     , div [] [ text model.repository.fullName ]
     , div [] [ text model.repository.description ]
+    , Issues.view address model
     ]
