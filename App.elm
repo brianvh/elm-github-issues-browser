@@ -7,7 +7,6 @@ import StartApp
 import Types exposing (Model, Repository)
 import Actions exposing (Action(..))
 import Repository
-import Debug
 import Issues
 import GetAllRepositoryData
 
