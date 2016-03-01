@@ -28,14 +28,6 @@ repositoryDecoder =
     |: ("description" := JD.string)
 
 
-getRepositoryAndIssueData : String -> Effects Action
-getRepositoryAndIssueData input =
-  [ getRepositoryData input
-  , Issues.getIssuesData input
-  ]
-    |> Effects.batch
-
-
 getRepositoryData : String -> Effects Action
 getRepositoryData userRepoString =
   Http.get repositoryDecoder ("https://api.github.com/repos/" ++ userRepoString)
