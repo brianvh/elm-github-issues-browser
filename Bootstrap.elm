@@ -39,6 +39,21 @@ column6 =
   column 6
 
 
+column9 : List Html -> Html
+column9 =
+  column 9
+
+
+column12 : List Html -> Html
+column12 =
+  column 12
+
+
 formGroup : List Html -> Html
 formGroup =
   div [ class "form-group" ]
+
+
+pageHeader : List Html -> Html
+pageHeader =
+  div [ class "page-header" ]

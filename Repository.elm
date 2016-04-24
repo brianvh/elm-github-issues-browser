@@ -12,7 +12,7 @@ import Task
 import Types exposing (Repository, Model)
 import Actions exposing (Action(..))
 import Issues
-import Bootstrap exposing (container, row, column3, column6, btnDefault)
+import Bootstrap exposing (container, row, column3, column6, btnDefault, column12, pageHeader)
 
 
 nullRepository : Repository
@@ -61,7 +61,7 @@ view : Signal.Address Action -> Model -> Html
 view address model =
   container
     [ row
-        [ column6 [ h5 [] [ text "GitHub Issue Browser" ] ]
+        [ column6 [ h4 [] [ text "GitHub Issue Browser" ] ]
         , column3 [ (repositoryNameInput address model) ]
         , column3
             [ btnDefault
@@ -69,7 +69,16 @@ view address model =
                 [ text "Go!" ]
             ]
         ]
-    , div [] [ text model.repository.fullName ]
-    , div [] [ text model.repository.description ]
+    , row
+        [ column12
+            [ pageHeader
+                [ h1
+                    []
+                    [ text model.repository.fullName
+                    , small [] [ text model.repository.description ]
+                    ]
+                ]
+            ]
+        ]
     , Issues.view address model
     ]

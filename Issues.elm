@@ -10,6 +10,7 @@ import Json.Decode.Extra exposing ((|:))
 import Effects exposing (Effects)
 import Task
 import List
+import Bootstrap exposing (btnDefault)
 
 
 nullIssue : Issue
@@ -49,7 +50,7 @@ view address model =
   div
     []
     (List.concat
-      [ [ button [ onClick address FetchGithubIssues ] [ text "Fetch issues" ] ]
+      [ [ btnDefault [ onClick address FetchGithubIssues ] [ text "Fetch issues" ] ]
       , List.map
           renderIssue
           model.issues
