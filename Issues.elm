@@ -10,7 +10,7 @@ import Json.Decode.Extra exposing ((|:))
 import Effects exposing (Effects)
 import Task
 import List
-import Bootstrap exposing (btnDefault)
+import Bootstrap exposing (btnDefault, column12, row)
 
 
 nullIssue : Issue
@@ -42,7 +42,8 @@ getIssuesData userRepoString =
 
 renderIssue : Issue -> Html
 renderIssue issue =
-  div [] [ text issue.title ]
+  row
+    [ column12 [ h4 [] [ text issue.title ] ] ]
 
 
 view : Signal.Address Action -> Model -> Html
