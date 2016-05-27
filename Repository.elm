@@ -4,14 +4,15 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Json.Decode as JD exposing ((:=), Decoder)
-import Http
 import String
 import Json.Decode.Extra exposing ((|:))
-import Task
+import Task exposing (Task)
 import Types exposing (Repository, Model)
 import Msgs exposing (Msg(..))
 import Issues
 import Bootstrap exposing (container, row, column3, column6, btnDefault, column12, pageHeader)
+import Request
+import HttpBuilder
 
 
 nullRepository : Repository
@@ -31,8 +32,13 @@ repositoryDecoder =
 getRepositoryData : String -> Cmd Msg
 getRepositoryData userRepoString =
     Task.perform (always NoOp)
-        NewGithubData
-        (Http.get repositoryDecoder ("https://api.github.com/repos/" ++ userRepoString))
+        (NewGithubData << .data)
+        (httpRequest userRepoString)
+
+
+httpRequest : String -> Task (HttpBuilder.Error String) (HttpBuilder.Response Repository)
+httpRequest userRepoString =
+    Request.gitHubRequest userRepoString repositoryDecoder
 
 
 repositoryNameInput : Model -> Html Msg
