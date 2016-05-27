@@ -1,20 +1,20 @@
-module Types (..) where
+module Types exposing (..)
 
 
 type alias Model =
-  { repository : Repository
-  , input : String
-  , issues : List Issue
-  }
+    { repository : Repository
+    , input : String
+    , issues : List Issue
+    }
 
 
 type alias Repository =
-  { fullName : String
-  , description : String
-  }
+    { fullName : String
+    , description : String
+    }
 
 
 type alias Issue =
-  { title : String
-  , createdAt : String
-  }
+    { title : String
+    , createdAt : String
+    }
