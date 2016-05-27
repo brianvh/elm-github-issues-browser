@@ -18,8 +18,8 @@ initialModel =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update action model =
-    case action of
+update msg model =
+    case msg of
         NoOp ->
             ( model, Cmd.none )
 

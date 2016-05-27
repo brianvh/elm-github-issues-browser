@@ -1,7 +1,6 @@
 module Msgs exposing (..)
 
 import Types exposing (Repository)
-import Http
 
 
 type Msg
