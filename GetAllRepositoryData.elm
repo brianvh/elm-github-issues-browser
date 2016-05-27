@@ -1,14 +1,13 @@
-module GetAllRepositoryData (..) where
+module GetAllRepositoryData exposing (..)
 
 import Repository
 import Issues
-import Effects exposing (Effects)
-import Actions exposing (Action)
+import Msgs exposing (Msg)
 
 
-getRepositoryAndIssueData : String -> Effects Action
+getRepositoryAndIssueData : String -> Cmd Msg
 getRepositoryAndIssueData input =
-  [ Repository.getRepositoryData input
-  , Issues.getIssuesData input
-  ]
-    |> Effects.batch
+    [ Repository.getRepositoryData input
+    , Issues.getIssuesData input
+    ]
+        |> Cmd.batch

@@ -1,84 +1,74 @@
-module Repository (..) where
+module Repository exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick, on, targetValue)
+import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import Json.Decode as JD exposing ((:=), Decoder)
 import Http
 import String
 import Json.Decode.Extra exposing ((|:))
-import Effects exposing (Effects)
 import Task
 import Types exposing (Repository, Model)
-import Actions exposing (Action(..))
+import Msgs exposing (Msg(..))
 import Issues
 import Bootstrap exposing (container, row, column3, column6, btnDefault, column12, pageHeader)
 
 
 nullRepository : Repository
 nullRepository =
-  { fullName = "Loading..."
-  , description = ""
-  }
+    { fullName = "Loading..."
+    , description = ""
+    }
 
 
 repositoryDecoder : Decoder Repository
 repositoryDecoder =
-  JD.succeed Repository
-    |: ("full_name" := JD.string)
-    |: ("description" := JD.string)
+    JD.succeed Repository
+        |: ("full_name" := JD.string)
+        |: ("description" := JD.string)
 
 
-getRepositoryData : String -> Effects Action
+getRepositoryData : String -> Cmd Msg
 getRepositoryData userRepoString =
-  Http.get repositoryDecoder ("https://api.github.com/repos/" ++ userRepoString)
-    |> Task.toResult
-    |> Task.map NewGithubData
-    |> Effects.task
+    Task.perform (always NoOp)
+        NewGithubData
+        (Http.get repositoryDecoder ("https://api.github.com/repos/" ++ userRepoString))
 
 
-repositoryNameInput : Signal.Address Action -> Model -> Html
-repositoryNameInput address model =
-  Html.form
-    []
-    [ Bootstrap.formGroup
-        [ input
-            [ on
-                "input"
-                targetValue
-                (\str ->
-                  Signal.message address (UpdateRepositoryName str)
-                )
-            , value model.input
-            , class "form-control"
-            ]
-            []
-        ]
-    ]
-
-
-view : Signal.Address Action -> Model -> Html
-view address model =
-  container
-    [ row
-        [ column6 [ h4 [] [ text "GitHub Issue Browser" ] ]
-        , column3 [ (repositoryNameInput address model) ]
-        , column3
-            [ btnDefault
-                [ onClick address FetchGithubData, disabled (String.isEmpty model.input) ]
-                [ text "Go!" ]
+repositoryNameInput : Model -> Html Msg
+repositoryNameInput model =
+    Html.form []
+        [ Bootstrap.formGroup
+            [ input
+                [ onInput UpdateRepositoryName
+                , value model.input
+                , class "form-control"
+                ]
+                []
             ]
         ]
-    , row
-        [ column12
-            [ pageHeader
-                [ h1
-                    []
-                    [ text model.repository.fullName
-                    , small [] [ text model.repository.description ]
+
+
+view : Model -> Html Msg
+view model =
+    container
+        [ row
+            [ column6 [ h4 [] [ text "GitHub Issue Browser" ] ]
+            , column3 [ (repositoryNameInput model) ]
+            , column3
+                [ btnDefault [ onClick FetchGithubData, disabled (String.isEmpty model.input) ]
+                    [ text "Go!" ]
+                ]
+            ]
+        , row
+            [ column12
+                [ pageHeader
+                    [ h1 []
+                        [ text model.repository.fullName
+                        , small [] [ text model.repository.description ]
+                        ]
                     ]
                 ]
             ]
+        , Issues.view model
         ]
-    , Issues.view address model
-    ]
