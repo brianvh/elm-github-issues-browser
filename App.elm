@@ -1,12 +1,35 @@
 module MyApp exposing (..)
 
 import Html exposing (Html)
-import Html.App as Html
 import Types exposing (Model, Repository)
 import Msgs exposing (Msg(..))
 import Repository
 import Issues
 import GetAllRepositoryData
+import Navigation
+import String
+
+
+-- URL PARSING
+
+
+toUrl : Model -> String
+toUrl model =
+    "#/" ++ model.input
+
+
+fromUrl : String -> String
+fromUrl url =
+    String.dropLeft 2 url
+
+
+urlParser : Navigation.Parser String
+urlParser =
+    Navigation.makeParser (fromUrl << .hash)
+
+
+
+-- MODEL AND UPDATE
 
 
 initialModel : Model
@@ -18,13 +41,17 @@ initialModel =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update action model =
-    case action of
+update msg model =
+    case msg of
         NoOp ->
             ( model, Cmd.none )
 
         UpdateRepositoryName string ->
-            ( { model | input = string }, Cmd.none )
+            let
+                newModel =
+                    { model | input = string }
+            in
+                ( newModel, Navigation.newUrl (toUrl newModel) )
 
         FetchGithubData ->
             ( model, Repository.getRepositoryData model.input )
@@ -39,14 +66,19 @@ update action model =
             ( { model | issues = issues }, Cmd.none )
 
 
+urlUpdate : String -> Model -> ( Model, Cmd Msg )
+urlUpdate newInput model =
+    ( { model | input = newInput }, Cmd.none )
+
+
 view : Model -> Html Msg
 view model =
     Html.div [] [ Repository.view model ]
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel, GetAllRepositoryData.getRepositoryAndIssueData initialModel.input )
+init : String -> ( Model, Cmd Msg )
+init url =
+    ( { initialModel | input = url }, GetAllRepositoryData.getRepositoryAndIssueData url )
 
 
 subscriptions : Model -> Sub Msg
@@ -56,9 +88,10 @@ subscriptions model =
 
 main : Program Never
 main =
-    Html.program
+    Navigation.program urlParser
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , urlUpdate = urlUpdate
         }

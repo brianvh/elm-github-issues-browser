@@ -5,11 +5,12 @@ import Html.Events exposing (onClick)
 import Types exposing (Model, Issue)
 import Msgs exposing (Msg(..))
 import Json.Decode as JD exposing ((:=), Decoder)
-import Http
 import Json.Decode.Extra exposing ((|:))
-import Task
+import Task exposing (Task)
 import List
 import Bootstrap exposing (btnDefault, column12, row)
+import Request
+import HttpBuilder
 
 
 nullIssue : Issue
@@ -34,8 +35,13 @@ issuesDecoder =
 getIssuesData : String -> Cmd Msg
 getIssuesData userRepoString =
     Task.perform (always NoOp)
-        NewGithubIssues
-        (Http.get issuesDecoder ("https://api.github.com/repos/" ++ userRepoString ++ "/issues"))
+        (NewGithubIssues << .data)
+        (httpRequest userRepoString)
+
+
+httpRequest : String -> Task (HttpBuilder.Error String) (HttpBuilder.Response (List Issue))
+httpRequest userRepoString =
+    Request.gitHubRequest (userRepoString ++ "/issues") issuesDecoder
 
 
 renderIssue : Issue -> Html Msg
